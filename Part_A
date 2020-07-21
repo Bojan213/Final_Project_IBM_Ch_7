@@ -1,1 +1,72 @@
+#Import necessary packages
+import pandas as pd
+import numpy as np
+import matplotlib as mtp
+import matplotlib.pyplot as plt
 
+#Read File
+jimmer = pd.read_csv("Topic_Survey_Assignment.csv", index_col=0)
+
+#Sort by descending very interested values
+jimmer.sort_values("Very interested", ascending=False, inplace = True)
+
+#Find total entrants for each column
+jimmer['Total'] = jimmer.sum(axis=1)
+
+#Find percentage to 2 decimal places
+jimmer["Very interested"] = round(jimmer["Very interested"]/jimmer['Total'], 2)
+jimmer["Somewhat interested"] = round(jimmer["Somewhat interested"]/jimmer['Total'],2)
+jimmer["Not interested"] = round(jimmer["Not interested"]/jimmer['Total'],2)
+
+#Drop the total column
+jimmer.drop(['Total'], axis=1, inplace = True)
+
+#Print the data frame in its entirity
+print(jimmer.to_string())
+
+#Create the plot using the artist layer
+#The plot must:
+#use a figure size of (20, 8),
+#have a bar width of 0.8,
+#use color #5cb85c for the Very interested bars,
+#color #5bc0de for the Somewhat interested bars,
+#and color #d9534f for the Not interested bars,
+#use font size 14 for the bar labels, percentages, and legend,
+#use font size 16 for the title, and,
+#display the percentages above the bars as shown above, and remove the left, top, and right borders
+
+#Create graph
+artist = jimmer.plot(
+    kind = 'bar',
+    width = 0.8,
+    figsize = (20,8),
+    color = ['#5cb85c', '#5bc0de', '#d9534f'],
+    )
+
+#Title with adjusted font size
+artist.set_title("Percentage of Respondents' Interest in Data Science Areas", fontsize = 16)
+
+#Legend with adjusted font size
+artist.legend(loc='best', fontsize=14)
+
+#Bar labels with adjusted font size
+artist.tick_params(axis='x', labelsize = 14)
+
+#Remove the borders around the graph
+artist.spines['right'].set_visible(False)
+artist.spines['left'].set_visible(False)
+artist.spines['top'].set_visible(False)
+
+#Remove ticks and vlaues on the y axis
+artist.axes.yaxis.set_visible(False)
+
+#Put values onto the graph
+c = 0
+for b in range(0,6):
+    for index, val in enumerate((jimmer).iloc[b]):
+        value = format(val)
+        artist.annotate(value, xy=(index/3.9 -0.37+c, float(value)+0.02), color='black', fontsize=14)
+    c = c+1
+
+#Display the Plot
+plt.show()
