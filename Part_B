@@ -1,1 +1,45 @@
+#Import necessary package(s)
+import pandas as pd
+import folium as fo
 
+#Read the csv file
+jimmer = pd.read_csv("Police_Department_Incidents_-_Previous_Year__2016_.csv")
+
+#Group the data by Neighborhood (ie Police District)
+jimmer_2 = (jimmer.groupby(["PdDistrict"]).count())
+
+#Reset indices of jimmer_2
+jimmer_2.reset_index(inplace=True)
+
+#Select necessary columns of jimmer_2
+jimmer_2 = jimmer_2.iloc[:,0:2]
+
+#Change the column names
+jimmer_2.rename(columns={'PdDistrict': 'Neighborhood', 'IncidntNum': 'Count'}, inplace = True)
+
+#Download the json file for San Francisco Neighborhood
+sf_geo = r'san-francisco.geojson'
+
+#Set longitude and latitude values for San Francisco
+long = 37.7749
+lat = -122.4194
+
+#Get a map of San Francisco with zoom star = 12
+sf_map = fo.Map(location=[long, lat], zoom_start=12)
+
+sf_map.choropleth(
+    geo_data=sf_geo,
+    data=jimmer_2,
+    columns=['Neighborhood', 'Count'],
+    key_on='feature.properties.DISTRICT',
+    fill_color='YlOrRd',
+    fill_opacity=0.7,
+    line_opacity=0.2,
+    legend_name='Crime Rate in each San Francisco Neighborhood'
+)
+
+#Save the map in html
+sf_map.save('map.html')
+
+#Print Data Frame
+print(jimmer_2.to_string())
